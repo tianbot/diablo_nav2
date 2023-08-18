@@ -11,6 +11,7 @@ from launch_ros.actions import Node
 def generate_launch_description():
     
     nav2_dir = os.path.join(get_package_share_directory('diablo_navigation2'))
+    ekf_launch_dir = os.path.join(get_package_share_directory('robot_localization'),'launch')
     use_sim_time = LaunchConfiguration('use_sim_time', default='false')
     map_dir = LaunchConfiguration(
         'map',
@@ -22,6 +23,10 @@ def generate_launch_description():
     param_dir = LaunchConfiguration(
         'params_file',
         default = [nav2_dir,'/params','/diablo_nav2.yaml']
+    )
+    ekf_config_dir = LaunchConfiguration(
+        'params_file',
+        default = [nav2_dir,'/config','/ekf.yaml']
     )
 
     
@@ -40,6 +45,12 @@ def generate_launch_description():
                     'map':map_dir,
                     'use_sim_time':use_sim_time,
                     'params_file':param_dir
+                }.items(),
+            ),
+            IncludeLaunchDescription(
+            	PythonLaunchDescriptionSource([ekf_launch_dir,'/ekf.launch.py']),
+            	launch_arguments = {
+                    'params_file':ekf_config_dir
                 }.items(),
             ),
             # IncludeLaunchDescription(
